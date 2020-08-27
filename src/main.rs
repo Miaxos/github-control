@@ -4,6 +4,7 @@ mod infrastructure;
 use application::configuration::config_file::ApplicationConfiguration;
 use clap::clap_app;
 use std::io::{stdin, stdout};
+use std::process::exit;
 use termion::raw::IntoRawMode;
 
 fn main() {
@@ -21,7 +22,13 @@ fn main() {
     let cfg = ApplicationConfiguration::load_or_exit();
 
     let stdin = stdin();
-    let mut stdout = stdout().into_raw_mode().unwrap();
+    let mut stdout = match stdout().into_raw_mode() {
+        Ok(stdout) => stdout,
+        Err(_) => {
+            println!("Can't capture stdout raw mode, try to avoid piping this command");
+            exit(exitcode::IOERR);
+        }
+    };
 
     application::screen_writer::ScreenWriter::cursor_hide(&mut stdout);
     application::screen_writer::ScreenWriter::clear_screen(&mut stdout);
