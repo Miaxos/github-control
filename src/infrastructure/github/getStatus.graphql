@@ -1,0 +1,23 @@
+query ViewTest($first: Int!) { 
+  viewer { 
+    login,
+    pullRequests(first: $first, orderBy: { field: CREATED_AT, direction:  DESC}, states: [OPEN]) {
+      edges {
+        node {
+          title,
+          url,
+          reviewDecision,
+          commits(last: 1) {
+            nodes {
+              commit {
+                statusCheckRollup {
+                  state
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
