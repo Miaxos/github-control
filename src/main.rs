@@ -5,6 +5,9 @@ use application::configuration::config_file::ApplicationConfiguration;
 use clap::clap_app;
 use std::io::{stdin, stdout};
 use std::process::exit;
+use std::sync::{Arc, Mutex};
+use std::thread;
+use std::time::Duration;
 use termion::raw::IntoRawMode;
 
 fn main() {
@@ -42,10 +45,31 @@ fn main() {
             }
         };
 
-    let writer = application::screen_writer::ScreenWriter::new(0, &mut prs);
+    let writer = Arc::new(Mutex::new(application::screen_writer::ScreenWriter::new(
+        0, &mut prs,
+    )));
 
-    writer.go_to_begining(&mut stdout);
-    writer.print_tupple(&mut stdout);
-    writer.waiting_keys(stdin, &mut stdout);
+    let my_writer_1 = Arc::clone(&writer);
+    let my_writer_2 = Arc::clone(&writer);
+
+    thread::spawn(|| loop {
+        thread::sleep(Duration::from_millis(5000));
+        println!("go");
+        let mut prs2: Vec<(String, String)> =
+            match infrastructure::github::github::get_prs_from_github(cfg.github_key()) {
+                Ok(result) => result,
+                Err(err) => {
+                    println!("[ERROR]:{}", err);
+                    panic!();
+                }
+            };
+
+        my_writer_1.lock().unwrap().update_tupple(&mut prs2);
+    });
+
+    my_writer_2.lock().unwrap().go_to_begining(&mut stdout);
+    my_writer_2.lock().unwrap().print_tupple(&mut stdout);
+    my_writer_2.lock().unwrap().waiting_keys(stdin, &mut stdout);
+
     application::screen_writer::ScreenWriter::cursor_show(&mut stdout);
 }
