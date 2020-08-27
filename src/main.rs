@@ -2,10 +2,22 @@ mod application;
 mod infrastructure;
 
 use application::configuration::config_file::ApplicationConfiguration;
+use clap::clap_app;
 use std::io::{stdin, stdout};
 use termion::raw::IntoRawMode;
 
 fn main() {
+    let matches = clap_app!(ghubcontrol =>
+        (version: "0.1.0")
+        (author: "Anthony Griffon <an.griffon@gmail.com>")
+        (about: "Get your current PRs from github inside your terminal")
+        (@arg refresh: -r --refresh +takes_value "Will refresh PRs every X seconds")
+    )
+    .get_matches();
+
+    let _refresh_value = matches.value_of("refresh");
+    // todo!("Add thread::spawn wich will update prs");
+
     let cfg = ApplicationConfiguration::load_or_exit();
 
     let stdin = stdin();
