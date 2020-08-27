@@ -11,16 +11,13 @@ type URI = String;
 )]
 struct ViewTest;
 
-pub fn get_truc() -> Result<Vec<(String, String)>, anyhow::Error> {
+pub fn get_truc(api: &String) -> Result<Vec<(String, String)>, anyhow::Error> {
     let q = ViewTest::build_query(view_test::Variables { first: 20 });
     let client = reqwest::blocking::Client::new();
 
     let mut res = client
         .post("https://api.github.com/graphql")
-        .header(
-            "Authorization",
-            "bearer {}",
-        )
+        .header("Authorization", format!("bearer {}", api))
         .header("User-Agent", "miaxos/github-control")
         .json(&q)
         .send()
