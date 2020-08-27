@@ -11,19 +11,22 @@ type URI = String;
 )]
 struct ViewTest;
 
-pub fn get_truc(api: &String) -> Result<Vec<(String, String)>, anyhow::Error> {
+/**
+ * Get PRs from github
+ * Should be rewrite with a Encoder/Decoder/Codec.
+ */
+pub fn get_prs_from_github(api: &String) -> Result<Vec<(String, String)>, anyhow::Error> {
     let q = ViewTest::build_query(view_test::Variables { first: 20 });
     let client = reqwest::blocking::Client::new();
 
-    let mut res = client
+    let res = client
         .post("https://api.github.com/graphql")
         .header("Authorization", format!("bearer {}", api))
         .header("User-Agent", "miaxos/github-control")
         .json(&q)
-        .send()
-        .unwrap();
+        .send()?;
 
-    let response_body: Response<view_test::ResponseData> = res.json().unwrap();
+    let response_body: Response<view_test::ResponseData> = res.json()?;
     let response_data: view_test::ResponseData = response_body.data.expect("missing response data");
 
     let mut result: Vec<(String, String)> = vec![];

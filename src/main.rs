@@ -15,7 +15,7 @@ fn main() {
     application::screen_writer::ScreenWriter::clear_screen(&mut stdout);
 
     let mut prs: Vec<(String, String)> =
-        match infrastructure::github::github::get_truc(cfg.github_key()) {
+        match infrastructure::github::github::get_prs_from_github(cfg.github_key()) {
             Ok(result) => result,
             Err(err) => {
                 println!("[ERROR]:{}", err);
