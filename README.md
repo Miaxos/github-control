@@ -36,6 +36,12 @@ Stored inside: `?`
 
 - **-r**, **--refresh** <refresh>: Will refresh PRs every X seconds instead of every 60 seconds
 
+## Usage
+
+- Use `j/k` to navigate accross Pull Requests.
+- Use `o` to  open the pull request inside your browser.
+- Use `q/ESC` to quit.
+
 ## Installation
 
 Github-control is written in [Rust](http://www.rust-lang.org). You will need rustc version 1.45.2 or higher. The recommended way to install Rust is from the official download page.
