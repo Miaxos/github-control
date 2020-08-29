@@ -14,7 +14,7 @@ Feel free to give me feedback about it :-).
 
 ## Screenshots
 
-create screenshot
+![Demo usecase for Github-control](github-control-screen.png?raw=true "Github-control Demo")
 
 ## Configuration files
 
