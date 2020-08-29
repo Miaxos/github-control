@@ -44,7 +44,7 @@ pub fn get_prs_from_github(api: &String) -> Result<Vec<(String, String)>, anyhow
     {
         if let Some(edge) = edge_opt {
             if let Some(node) = &edge.node {
-                if let (Some(commits), Some(review_decision)) =
+                if let (Some(commits), review_decision) =
                     (&node.commits.nodes, &node.review_decision)
                 {
                     if let Some(Some(commit)) = &commits.first() {
@@ -59,10 +59,13 @@ pub fn get_prs_from_github(api: &String) -> Result<Vec<(String, String)>, anyhow
                             };
 
                             let v = match &review_decision {
-                                view_test::PullRequestReviewDecision::APPROVED => "✅",
-                                view_test::PullRequestReviewDecision::REVIEW_REQUIRED => "👋",
-                                view_test::PullRequestReviewDecision::CHANGES_REQUESTED => "🚫",
-                                view_test::PullRequestReviewDecision::Other(_) => "🤔",
+                                Some(view_test::PullRequestReviewDecision::APPROVED) => "✅",
+                                Some(view_test::PullRequestReviewDecision::REVIEW_REQUIRED) => "👋",
+                                Some(view_test::PullRequestReviewDecision::CHANGES_REQUESTED) => {
+                                    "🚫"
+                                }
+                                Some(view_test::PullRequestReviewDecision::Other(_)) => "🤔",
+                                None => "👻", // No review needed
                             };
                             result.push((
                                 format!("{:?} - [Review: {:?}] [CI: {}]", &node.title, v, value),
