@@ -1,29 +1,28 @@
 use std::cell::Cell;
 use std::convert::TryInto;
-use std::io::{Stdin, Stdout, Write};
-use termion::event::Key;
-use termion::input::TermRead;
+use std::io::{Stdout, Write};
 use termion::raw::RawTerminal;
 
-pub struct ScreenWriter<'a> {
+pub struct ScreenWriter {
     /// Current selected line
     current_line: Cell<usize>,
-    tupples: &'a mut Vec<(String, String)>,
+    tupples: Vec<(String, String)>,
 }
 
-impl<'c> ScreenWriter<'c> {
-    pub fn new<'a>(
-        current_line: usize,
-        tupples: &'a mut Vec<(String, String)>,
-    ) -> ScreenWriter<'a> {
+impl ScreenWriter {
+    pub fn new(current_line: usize, tupples: Vec<(String, String)>) -> ScreenWriter {
         ScreenWriter {
             current_line: Cell::new(current_line),
             tupples,
         }
     }
 
-    pub fn update_tupple(&mut self, tupples: &'c mut Vec<(String, String)>) -> () {
+    pub fn update_tupple(&mut self, tupples: Vec<(String, String)>) -> () {
         (*self).tupples = tupples;
+        let len = (*self).tupples.len();
+        if self.current_line.get() > len - 1 {
+            self.current_line.set(len - 1);
+        }
     }
 
     pub fn clear_screen(stdout: &mut RawTerminal<Stdout>) -> () {
@@ -44,15 +43,14 @@ impl<'c> ScreenWriter<'c> {
         write!(*stdout, "{}", termion::cursor::Show,).unwrap();
     }
 
-    pub fn go_to_begining(&self, stdout: &mut RawTerminal<Stdout>) -> () {
+    pub fn go_to_begining(stdout: &mut RawTerminal<Stdout>) -> () {
         write!(*stdout, "{}", termion::cursor::Goto(1, 1)).unwrap();
     }
 
     pub fn print_tupple(&self, stdout: &mut RawTerminal<Stdout>) -> () {
-        // Reset selected line
-        if self.current_line.get() > self.tupples.len() - 1 {
-            self.current_line
-                .set(self.tupples.len().try_into().unwrap());
+        if self.tupples.is_empty() {
+            write!(*stdout, "No PRs...").unwrap();
+            return ();
         }
 
         let _bl = self
@@ -76,35 +74,30 @@ impl<'c> ScreenWriter<'c> {
         (*stdout).flush().unwrap();
     }
 
-    pub fn waiting_keys(&self, stdin: Stdin, stdout: &mut RawTerminal<Stdout>) -> () {
-        for c in stdin.keys() {
-            match c.unwrap() {
-                Key::Ctrl('c') => break,
-                Key::Char('q') => break,
-                Key::Esc => break,
-                Key::Char('o') => {
-                    let current_url = (*(*self).tupples).get(self.current_line.get());
-                    match current_url {
-                        Some((_, url)) => {
-                            let _bl = webbrowser::open(url);
-                        }
-                        _ => {}
-                    };
-                }
-                Key::Char('k') => {
-                    if self.current_line.get() > 0 {
-                        self.current_line.set(self.current_line.get() - 1)
-                    }
-                }
-                Key::Char('j') => {
-                    if self.current_line.get() < self.tupples.len() - 1 {
-                        self.current_line.set(self.current_line.get() + 1)
-                    }
-                }
-                _ => {}
-            }
-            self.go_to_begining(stdout);
-            self.print_tupple(stdout);
+    /**
+     * Get current url from PRs
+     */
+    pub fn get_current_url(&self) -> Option<String> {
+        (*(*self).tupples)
+            .get(self.current_line.get())
+            .map(|x| x.1.clone())
+    }
+
+    /**
+     * Try to go to the previous line.
+     */
+    pub fn try_previous_line(&self) -> () {
+        if self.current_line.get() > 0 {
+            self.current_line.set(self.current_line.get() - 1)
+        }
+    }
+
+    /**
+     * Try to go to the next line.
+     */
+    pub fn try_next_line(&self) -> () {
+        if self.current_line.get() < self.tupples.len() - 1 {
+            self.current_line.set(self.current_line.get() + 1)
         }
     }
 }

@@ -27,7 +27,12 @@ pub fn get_prs_from_github(api: &String) -> Result<Vec<(String, String)>, anyhow
         .send()?;
 
     let response_body: Response<view_test::ResponseData> = res.json()?;
-    let response_data: view_test::ResponseData = response_body.data.expect("missing response data");
+    let response_data: view_test::ResponseData = match response_body.data {
+        Some(response) => response,
+        None => {
+            return Err(anyhow!("No responses"));
+        }
+    };
 
     let mut result: Vec<(String, String)> = vec![];
 
