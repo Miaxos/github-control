@@ -54,7 +54,7 @@ pub fn get_prs_from_github(api: &String) -> Result<Vec<(String, String)>, anyhow
                                 view_test::StatusState::ERROR => "❌",
                                 view_test::StatusState::FAILURE => "⚠️",
                                 view_test::StatusState::EXPECTED => "✴️",
-                                view_test::StatusState::PENDING => "💤",
+                                view_test::StatusState::PENDING => "⚙️",
                                 view_test::StatusState::Other(_) => "🤔",
                             };
 
