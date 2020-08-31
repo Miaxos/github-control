@@ -29,7 +29,7 @@ jobs:
             const { data: deployment } = await github.repos.createDeployment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: `${name}@${version}`,
+              ref: ref,
               environment: 'crates.io',
               auto_merge: false,
               required_contexts: [],
