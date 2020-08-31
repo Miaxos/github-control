@@ -2,6 +2,14 @@
 name = "github-control"
 version = "0.1.0"
 authors = ["Anthony Griffon <an.griffon@gmail.com>"]
+description = "A simple commande line to keep control over your active pull requests on Github"
+homepage = "https://github.com/Miaxos/github-control"
+readme = "https://github.com/Miaxos/github-control/blob/master/README.md"
+repository = "https://github.com/Miaxos/github-control"
+documentation = "https://github.com/Miaxos/github-control"
+license = "MIT"
+keywords = ["github", "cli", "command", "line", "pull", "requests", "review"]
+categories = ["command-line-utilities"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
