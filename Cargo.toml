@@ -8,7 +8,7 @@ readme = "README.md"
 repository = "https://github.com/Miaxos/github-control"
 documentation = "https://github.com/Miaxos/github-control"
 license = "MIT"
-keywords = ["github", "cli", "command", "line", "pull", "requests", "review"]
+keywords = ["github", "cli", "pull", "requests", "review"]
 categories = ["command-line-utilities"]
 edition = "2018"
 
