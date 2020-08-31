@@ -21,9 +21,9 @@ jobs:
           github-token: ${{ secrets.TOKEN_REPO_WRITE }}
           previews: 'ant-man-preview,flash-preview'
           script: |
-            const ref = process.env.GITHUB_REF;
+            const ref = process.env.GITHUB_REF.match(/refs\/tags\/(.*)/)[1];
             const name = process.env.NAME;
-            const version = process.env.GITHUB_REF;
+            const version = ref;
             const directory = process.env.DIRECTORY;
 
             const { data: deployment } = await github.repos.createDeployment({
