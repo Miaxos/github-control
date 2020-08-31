@@ -13,8 +13,8 @@ jobs:
         id: deployment
         uses: actions/github-script@v2
         env:
-          VERSION: ${{ GITHUB_REF }}
-          REF: ${{ GITHUB_SHA }}
+          VERSION: ${{ secrets.GITHUB_REF }}
+          REF: ${{ secrets.GITHUB_REF }}
           NAME: "Github-control"
           DIRECTORY: "Github-control"
         with:
