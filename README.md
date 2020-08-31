@@ -20,6 +20,8 @@ Feel free to give me feedback about it :-).
 
 There is one essential configuration file wich contain a GITHUB api key.
 
+You'll be able to configurate icons too.
+
 -> What rights should be given ?
 (image)
 
