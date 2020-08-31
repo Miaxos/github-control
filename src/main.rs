@@ -43,15 +43,15 @@ fn main() {
         }
     };
 
-    let prs: Vec<(String, String)> =
-        match infrastructure::github::github::get_prs_from_github(cfg.github_key()) {
-            Ok(result) => result,
-            Err(_) => {
-                let _ = stdout.suspend_raw_mode();
-                println!("Can't request Github PRs, check if your token is in set up");
-                exit(exitcode::USAGE);
-            }
-        };
+    let prs: Vec<(String, String)> = match infrastructure::github::github::get_prs_from_github(&cfg)
+    {
+        Ok(result) => result,
+        Err(_) => {
+            let _ = stdout.suspend_raw_mode();
+            println!("Can't request Github PRs, check if your token is in set up");
+            exit(exitcode::USAGE);
+        }
+    };
 
     application::screen_writer::ScreenWriter::cursor_hide(&mut stdout);
 
@@ -69,7 +69,7 @@ fn main() {
     thread::spawn(move || loop {
         thread::sleep(Duration::from_secs(refresh_value));
         let prs2: Vec<(String, String)> =
-            match infrastructure::github::github::get_prs_from_github(cfg.github_key()) {
+            match infrastructure::github::github::get_prs_from_github(&cfg) {
                 Ok(result) => result,
                 Err(err) => {
                     println!("[ERROR]:{}", err);

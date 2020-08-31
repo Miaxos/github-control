@@ -1,3 +1,4 @@
+use crate::application::configuration::config_file::ApplicationConfiguration;
 use anyhow::*;
 use graphql_client::*;
 
@@ -15,7 +16,10 @@ struct ViewTest;
  * Get PRs from github
  * Should be rewrite with a Encoder/Decoder/Codec.
  */
-pub fn get_prs_from_github(api: &String) -> Result<Vec<(String, String)>, anyhow::Error> {
+pub fn get_prs_from_github(
+    cfg: &ApplicationConfiguration,
+) -> Result<Vec<(String, String)>, anyhow::Error> {
+    let api = (*cfg).github_key();
     let q = ViewTest::build_query(view_test::Variables { first: 20 });
     let client = reqwest::blocking::Client::new();
 
@@ -50,22 +54,28 @@ pub fn get_prs_from_github(api: &String) -> Result<Vec<(String, String)>, anyhow
                     if let Some(Some(commit)) = &commits.first() {
                         if let Some(status) = &commit.commit.status_check_rollup {
                             let value = match &status.state {
-                                view_test::StatusState::SUCCESS => "✅",
-                                view_test::StatusState::ERROR => "❌",
-                                view_test::StatusState::FAILURE => "⚠️",
-                                view_test::StatusState::EXPECTED => "✴️",
-                                view_test::StatusState::PENDING => "⚙️",
-                                view_test::StatusState::Other(_) => "🤔",
+                                view_test::StatusState::SUCCESS => &(cfg).ci_success,
+                                view_test::StatusState::ERROR => &(cfg).ci_error,
+                                view_test::StatusState::FAILURE => &(cfg).ci_failure,
+                                view_test::StatusState::EXPECTED => &(cfg).ci_expected,
+                                view_test::StatusState::PENDING => &(cfg).ci_pending,
+                                view_test::StatusState::Other(_) => &(cfg).ci_other,
                             };
 
                             let v = match &review_decision {
-                                Some(view_test::PullRequestReviewDecision::APPROVED) => "✅",
-                                Some(view_test::PullRequestReviewDecision::REVIEW_REQUIRED) => "👋",
-                                Some(view_test::PullRequestReviewDecision::CHANGES_REQUESTED) => {
-                                    "🚫"
+                                Some(view_test::PullRequestReviewDecision::APPROVED) => {
+                                    &cfg.review_approved
                                 }
-                                Some(view_test::PullRequestReviewDecision::Other(_)) => "🤔",
-                                None => "👻", // No review needed
+                                Some(view_test::PullRequestReviewDecision::REVIEW_REQUIRED) => {
+                                    &cfg.review_required
+                                }
+                                Some(view_test::PullRequestReviewDecision::CHANGES_REQUESTED) => {
+                                    &cfg.review_changes_requested
+                                }
+                                Some(view_test::PullRequestReviewDecision::Other(_)) => {
+                                    &cfg.review_other
+                                }
+                                None => &cfg.review_no_required,
                             };
                             result.push((
                                 format!("{:?} - [Review: {:?}] [CI: {}]", &node.title, v, value),
