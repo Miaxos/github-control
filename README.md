@@ -59,10 +59,9 @@ Cargo will build the `github-control` binary and place it in `$HOME/.cargo` (thi
 
 ### Homebrew
 
-Coming Soon
-
 If you're using [homebrew](https://brew.sh/), you can use the `brew install` command:
 
+    brew tap miaxos/github-control
     brew install github-control
 
-TODO -> [Formulae](https://github.com/Homebrew/homebrew-core/blob/master/Formula/github-control.rb)
+[Formulae](https://github.com/miaxos/homebrew-github-control/blob/master/Formula/github-control.rb)
